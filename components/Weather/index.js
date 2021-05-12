@@ -8,6 +8,7 @@ export default function Weather({ ip }) {
 	const {weather, isLoading, isError} = getWeather( ip.lat, ip.lon )
 
 	if ( isError ) return <h1>Error occurred while loading weather data</h1>
+	if ( weather?.error ) return <h1>{ weather.error }</h1>
 	if ( isLoading ) return <h1>Loading...</h1>
 
 	const [ weatherData ] = weather?.data;
