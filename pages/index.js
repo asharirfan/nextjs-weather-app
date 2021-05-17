@@ -3,6 +3,7 @@ import Weather from '@/components/Weather'
 
 export default function Home({ ip }) {
 
+	console.log( ip );
 	return (
 		<Container>
 			<Weather ip={ ip } />
