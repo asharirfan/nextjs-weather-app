@@ -129,3 +129,15 @@
     flex-direction: column;
   }
 }
+
+.searchContainer {
+  width: 100%;
+}
+
+.searchInput {
+  display: block;
+  font-size: 16px;
+  margin-top: 10px;
+  padding: 10px;
+  width: 100%;
+}
