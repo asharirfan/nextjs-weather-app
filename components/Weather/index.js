@@ -15,10 +15,6 @@ export default function Weather({ ip }) {
 
 	return (
 		<>
-			<h1 className={styles.title}>
-				Weather App
-			</h1>
-
 			<h2 className={styles.description}>
 				{
 				isLoading ?
