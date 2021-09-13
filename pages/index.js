@@ -10,13 +10,16 @@ export default function Home() {
 		setIp({ lat: position.coords.latitude, long: position.coords.longitude });
 	};
 
-	const error = () => {};
+	const error = () => {
+		// On error, set default coordinates.
+		setIp({ lat: 31.3729722, long: 74.1743067 });
+	};
 
 	useEffect(() => {
 		navigator.geolocation.getCurrentPosition(success, error);
 	}, []);
 
-	console.log( ip );
+	// console.log( ip );
 	return (
 		<Container>
 			{

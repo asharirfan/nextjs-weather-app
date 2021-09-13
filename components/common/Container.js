@@ -10,7 +10,7 @@ export default function Container({ children }) {
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 			<main id="page-content" className={styles.main}>{ children }</main>
-			<Footer />
+			{/* <Footer /> */}
 		</div>
 	)
 }
