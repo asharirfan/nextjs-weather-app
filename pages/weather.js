@@ -3,7 +3,8 @@ import getLocaleDate from '@/functions/getLocaleDate';
 import getWeather from '@/functions/getWeather';
 import getWeatherIconUrl from '@/functions/getWeatherIconUrl';
 import styles from '@/styles/Home.module.css';
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function Weather( { geoLocation } ) {
 
@@ -23,11 +24,12 @@ export default function Weather( { geoLocation } ) {
 			geoLocationResult = geoLocation;
 		}
 
-		weather = await getWeather( geoLocationResult.latitude, geoLocationResult.longitude );
-
-		const [ weatherData ] = weather?.data;
-		setWeatherData( weatherData );
-		setLoading(false);
+		if ( undefined !== geoLocationResult ) {
+			weather = await getWeather( geoLocationResult.latitude, geoLocationResult.longitude );
+			const [ weatherData ] = weather?.data;
+			setWeatherData( weatherData );
+			setLoading(false);
+		}
 
 	}, [ geoLocationData ] );
 
@@ -97,10 +99,18 @@ export default function Weather( { geoLocation } ) {
 				</div>
 				<div>
 					<ul className="location-suggestions">
-						<li><a href="#">California</a></li>
-						<li><a href="#">Islamabad</a></li>
-						<li><a href="#">Istanbul</a></li>
-						<li><a href="#">London</a></li>
+						<li>
+							<Link href="/city/california"><a>California</a></Link>
+						</li>
+						<li>
+							<Link href="/city/islamabad"><a>Islamabad</a></Link>
+						</li>
+						<li>
+							<Link href="/city/istanbul"><a>Istanbul</a></Link>
+						</li>
+						<li>
+							<Link href="/city/london"><a>London</a></Link>
+						</li>
 					</ul>
 				</div>
 			</div>
