@@ -137,3 +137,12 @@
   padding: 10px 15px;
   width: 100%;
 }
+
+.location {
+  font-size: 1.5rem;
+}
+
+.temperature {
+  font-size: 5rem;
+  margin: 0 auto;
+}

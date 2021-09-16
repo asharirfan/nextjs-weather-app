@@ -5,6 +5,7 @@ import getWeatherIconUrl from '@/functions/getWeatherIconUrl';
 import styles from '@/styles/Home.module.css';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import queryGeoLocationData from '@/functions/queryGeoLocationData';
 
 export default function Weather( { geoLocation } ) {
 
@@ -45,22 +46,22 @@ export default function Weather( { geoLocation } ) {
 
 	return (
 		<Container>
-			<div id="weather-app">
-				<p className="location">
+			<div className={styles.weatherApp}>
+				<p className={styles.location}>
 					{
 						loading ?
 						'Loading...' :
 						weatherData.city_name
 					}
 				</p>
-				<p className="weather-temp">
+				<p className={styles.temperature}>
 					{
 						loading ?
 						'Loading...' :
 						`${weatherData.temp}°C`
 					}
 				</p>
-				<div>
+				<div className="weather-icon">
 					{
 						!loading ?
 						<img
@@ -89,42 +90,19 @@ export default function Weather( { geoLocation } ) {
 						getLocaleDate( weatherData.ts )
 					}
 				</h2>
-				<div>
+
+				<div className="weather-search">
 					<input
 						type="text"
 						className={styles.searchInput}
-						placeholder="Search your city name here..."
+						placeholder="Another Location"
 						onChange={handleGeolocationSearch}
 					/>
-				</div>
-				<div>
-					<ul className="location-suggestions">
-						<li>
-							<Link href="/city/california"><a>California</a></Link>
-						</li>
-						<li>
-							<Link href="/city/islamabad"><a>Islamabad</a></Link>
-						</li>
-						<li>
-							<Link href="/city/istanbul"><a>Istanbul</a></Link>
-						</li>
-						<li>
-							<Link href="/city/london"><a>London</a></Link>
-						</li>
-					</ul>
 				</div>
 			</div>
 		</Container>
 	);
 
-}
-
-// Call the Geodata API here.
-const queryGeoLocationData = async ( geoLocation ) => {
-	const request = await fetch(
-		`http://api.positionstack.com/v1/forward?access_key=${process.env.NEXT_PUBLIC_POSITION_STACK_KEY}&query=${geoLocation}`
-	);
-	return request.json();
 }
 
 export const getStaticProps = async () => {
