@@ -4,7 +4,6 @@ import getWeather from '@/functions/getWeather';
 import getWeatherIconUrl from '@/functions/getWeatherIconUrl';
 import styles from '@/styles/Home.module.css';
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import queryGeoLocationData from '@/functions/queryGeoLocationData';
 
 export default function Weather( { geoLocation } ) {
@@ -19,17 +18,29 @@ export default function Weather( { geoLocation } ) {
 		let geoLocationResult;
 
 		if ( '' !== geoLocationData ) {
-			geoLocationResult = await queryGeoLocationData( geoLocationData );
-			geoLocationResult = geoLocationResult?.data[0];
+
+			const response = await queryGeoLocationData( geoLocationData );
+
+			// Set Geo Location result to default city if the query fails.
+			if ( ! Array.isArray( response ) ) {
+				geoLocationResult = geoLocation;
+			} else {
+				[ geoLocationResult ] = response;
+			}
 		} else {
 			geoLocationResult = geoLocation;
 		}
 
 		if ( undefined !== geoLocationResult ) {
-			weather = await getWeather( geoLocationResult.latitude, geoLocationResult.longitude );
-			const [ weatherData ] = weather?.data;
-			setWeatherData( weatherData );
-			setLoading(false);
+			weather = await getWeather( geoLocationResult.lat, geoLocationResult.lon );
+
+			// @todo Add something here to gracefully handle errors.
+			if ( undefined !== weather ) {
+				setWeatherData( weather );
+				setLoading(false);
+			} else {
+				setLoading( true );
+			}
 		}
 
 	}, [ geoLocationData ] );
@@ -47,58 +58,66 @@ export default function Weather( { geoLocation } ) {
 	return (
 		<Container>
 			<div className={styles.weatherApp}>
-				<p className={styles.location}>
-					{
-						loading ?
-						'Loading...' :
-						weatherData.city_name
-					}
-				</p>
-				<p className={styles.temperature}>
-					{
-						loading ?
-						'Loading...' :
-						`${weatherData.temp}°C`
-					}
-				</p>
-				<div className="weather-icon">
-					{
-						!loading ?
-						<img
-							src={getWeatherIconUrl( weatherData.weather.icon )}
-							alt={weatherData.weather.description}
-						/>:
-						<img
-							src="https://www.weatherbit.io/static/img/icons/c01n.png"
-							alt=""
-						/>
-					}
-				</div>
+				{ typeof weatherData === 'object' ? (
+					<>
+						<p className={styles.location}>
+							{
+								loading ?
+								'Loading...' :
+								weatherData.city_name
+							}
+						</p>
+						<p className={styles.temperature}>
+							{
+								loading ?
+								'Loading...' :
+								`${weatherData.temp}°C`
+							}
+						</p>
+						<div className="weather-icon">
+							{
+								!loading ?
+								<img
+									src={getWeatherIconUrl( weatherData.weather.icon )}
+									alt={weatherData.weather.description}
+								/>:
+								<img
+									src="https://www.weatherbit.io/static/img/icons/c01n.png"
+									alt=""
+								/>
+							}
+						</div>
 
-				<p className={styles.weatherDetails}>
-					{
-						loading ?
-						'Loading...' :
-						weatherData.weather.description
-					}
-				</p>
+						<p className={styles.weatherDetails}>
+							{
+								loading ?
+								'Loading...' :
+								weatherData.weather.description
+							}
+						</p>
 
-				<h2 className={styles.description}>
-					{
-						loading ?
-						'Loading...' :
-						getLocaleDate( weatherData.ts )
-					}
-				</h2>
+						<h2 className={styles.description}>
+							{
+								loading ?
+								'Loading...' :
+								getLocaleDate( weatherData.ts )
+							}
+						</h2>
 
-				<div className="weather-search">
-					<input
-						type="text"
-						className={styles.searchInput}
-						placeholder="Another Location"
-						onChange={handleGeolocationSearch}
-					/>
-				</div>
+						<div className="weather-search">
+							<input
+								type="text"
+								className={styles.searchInput}
+								placeholder="Another Location"
+								onChange={handleGeolocationSearch}
+							/>
+						</div>
+					</>
+				) : (
+					<p className={styles.location}>
+						Error! Something went wrong.
+					</p>
+				) }
 			</div>
 		</Container>
 	);
@@ -108,9 +127,9 @@ export default function Weather( { geoLocation } ) {
 export const getStaticProps = async () => {
 
 	// Use SSR to show default city's weather.
-	const geoLocation = await queryGeoLocationData( process.env.NEXT_PUBLIC_DEFAULT_CITY );
+	const response = await queryGeoLocationData( process.env.NEXT_PUBLIC_DEFAULT_CITY );
 
-	if ( geoLocation.length < 0 ) {
+	if ( typeof response !== 'object' ) {
 		return {
 			props: {
 				geoLocation: {}
@@ -118,9 +137,11 @@ export const getStaticProps = async () => {
 		}
 	}
 
+	const [ geoLocation ] = response;
+
 	return {
 		props: {
-			geoLocation: geoLocation.data[0]
+			geoLocation: geoLocation
 		}
 	}
 }
