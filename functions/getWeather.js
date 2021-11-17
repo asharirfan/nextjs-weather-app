@@ -1,24 +1,28 @@
-// import useSWR from 'swr'
-// import fetcher from './fetcher'
+import axios from 'axios';
 
 export default async function getWeather (lat, long) {
 
-	// if ( lat === undefined || long === undefined ) {
-	// 	return {
-	// 		weather: {},
-	// 		isLoading: true,
-	// 		isError: false
-	// 	}
-	// }
+	const request = {
+		method: 'GET',
+		url: 'https://weatherbit-v1-mashape.p.rapidapi.com/current',
+		params: { lon: long, lat: lat },
+		headers: {
+			'x-rapidapi-host': 'weatherbit-v1-mashape.p.rapidapi.com',
+			'x-rapidapi-key': '81d4b5315fmshe3aab8d5a756f5ep1f9e54jsn69a66effba45'
+		},
+	};
 
-	const weatherAPI = `https://api.weatherbit.io/v2.0/current?lat=${lat}&lon=${long}&key=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&include=minutely`;
-	const data = await fetch( weatherAPI );
-	return data.json();
+	let weather = [];
 
-	// return {
-	// 	weather: data.json(),
-	// 	isLoading: !data,
-	// 	// isLoading: !error && !data,
-	// 	// isError: error
-	// }
+	try {
+		const response = await axios( request );
+
+		if ( response.status === 200 ) {
+			weather = response?.data?.data[0];
+		}
+	} catch (error) {
+		console.error( 'Weather API error', error );
+	}
+
+	return weather;
  }
